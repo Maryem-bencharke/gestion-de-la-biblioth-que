@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+    <link rel="stylesheet" href="css/style.css">
+    <!--<style>
+        table
+
+        {
+        border-style:solid;
+        border-width:2px;
+        border-color:#c18f59;
+        }
+        
+      
+        </style>-->
+
+	<title>Library</title>
+                
+    </head>
+
+    <body >
+
+
+    <meta charset="utf-8" />
+
+    <?php
+        require "connexion.php";
+        $query = "select * from ouvrage where 1";
+        $result = mysqli_query($connect , $query);
+        require 'param.php'; 
+        session_start();
+        if (!isset ($_SESSION['user']))
+            header('location:auth.php');
+        
+        if (time()- $_SESSION['LAT'] > $w)
+            header('location:deconnexion.php');
+        else
+            $_SESSION['LAT']=time();
+
+
+    echo "<h3 align=right>".'Welcome'.' '.$_SESSION['user']."</h3>"."<a href='deconnexion.php'><img align=right src=dec.png height=60px width=60px/></a>";
+    if($_SESSION['droit']=='AD'){
+        echo "<a href='user.php'><img align=right src=user.png height=60px width=60px/></a>";
+        echo "<a href='pret.php'><img align=right src=pret.png height=60px width=60px/></a>";
+        echo  "<a href='form.php'><img align=right src=add.jpg height=60px width=60px/></a>";
+    }
+    if($_SESSION['droit']=='U'){
+        echo "<a href=mespret.php?name=".$_SESSION['user']."><img align=right src=pret.png height=60px width=60px/></a>";
+    }
+    ?>
+
+    <br>
+    <center>
+            <form method="GET" action="recherche.php">
+            Chercher votre ouvrage
+            <br>
+            <input type="text" name="recherche" align="center" size="15">
+            <input type="submit" value="Rechercher"  align="center"alt="Lancer la recherche!">
+            </form>
+    </center>   
+    <br>
+
+
+<?php  
+if($_SESSION['droit']=='AD'){
+    echo "
+    <div id=wrapper>
+  <h1>Sortable Table of Search Queries</h1>
+  
+  <table id=keywords cellspacing=0 cellpadding=0>
+    <thead>
+      <tr>
+        <th><span>Keywords</span></th>
+        <th><span>Impressions</span></th>
+        <th><span>Clicks</span></th>
+        <th><span>CTR</span></th>
+        <th><span>Rank</span></th>
+      </tr>
+    </thead>";
+
+    echo '<hr WIDTH="100%" SIZE="2" ALIGN="left" NOSHADE>';
+    echo "<table border='1' align =center >
+
+    <tr>
+    <th>select</th>
+    <th>Id</th>
+    <th>Titre</th>
+    <th>Date de publication</th>
+    <th>Edition</th>
+    <th>auteur</th>
+    <th>numclass</th>
+    <th>disponibilite</th>
+    <th>couverture</th>
+    <th>edit</th>
+    <th>delete</th>
+    </tr>";
+    while($prod=mysqli_fetch_row($result))
+        {
+        
+            echo "<tr>";
+            echo "<td><input type='checkbox' name='prod[0]' value='$prod[0]'/> <br /></td>";
+
+            echo "<td>" . $prod[0] . "</td>";
+
+            echo "<td>" . $prod[1] . "</td>";
+    
+            echo "<td>" . $prod[2] . "</td>";
+    
+            echo "<td>" . $prod[3] . "</td>";
+    
+            echo "<td>" . $prod[4] . "</td>";
+        
+            echo "<td>" . $prod[5] . "</td>";
+
+            echo "<td>" . $prod[6] . "</td>";
+    
+            echo "<td><img src=photo/$prod[7].jpg height=100px width=100px ></td>";
+            echo "<td><a href='edit.php?num=$prod[0]'><img src=edit.png height=30px width=30px /></a></td>";
+            echo "<td><a href='del.php?num=$prod[0]'><img src=del.png height=30px width=30px /></a></td>";
+
+            echo "</tr>";
+        }
+        echo "</table>";  
+}  
+
+else{
+    $em=$_SESSION['user'];
+    //echo '<hr WIDTH="100%" SIZE="2" ALIGN="left" NOSHADE>';
+    $nm = "select * from utilisateur where 1";
+    $res = mysqli_query($connect , $nm);
+    while($pro = mysqli_fetch_row($res))
+    {
+        if ($pro[2]==$em) {
+            $name=$pro[1];
+            }
+    }
+    
+    while($prod=mysqli_fetch_row($result))
+    {
+        
+                echo "<table>";
+                echo "<TR><th>";
+                echo '<tr><hr SIZE="2" ALIGN="left" NOSHADE></tr>';
+                echo "<td><input type='checkbox' name='prod[0]' value='$prod[0]'/></td> <br /><td><a href='formbu.php?num=$prod[0] & name=$name'><img src=add2.png height=30px width=30px /></a></td>";
+				echo  "<tr><IMG SRC=img src=photo/$prod[7].jpg align=left height=150px width=150px >";
+                echo '<i><u>Informations sur l ouvrage</u></i>';
+				echo  "<TR ><TD width=50%>Id</TD><TD> ". $prod[0] . "</TD></TR> ";
+				echo  "<TR><TD>Titre</TD><TD> ". $prod[1] .  "</TD></TR> ";
+                echo  "<TR><TD>Date de publication</TD><TD> ". $prod[2] .  "</TD></TR> ";
+                echo  "<TR><TD>Edition</TD><TD> ". $prod[3] .  "</TD></TR> ";
+                echo  "<TR><TD>auteur</TD><TD> ". $prod[4] .  "</TD></TR> ";
+                echo  "<TR ><TD>numclass</TD><TD> ". $prod[5] .  "</TD></TR> ";
+                echo  "<TR ><TD>disponibilite</TD><TD> ". $prod[6] .  "</TD></TR> ";
+                echo "</th></tr>";
+                echo"</table>";
+                
+    }
+    echo '<tr><hr SIZE="2" NOSHADE></tr>';
+   
+   
+}
+
+?>
+
+</body>
+
+</html>
